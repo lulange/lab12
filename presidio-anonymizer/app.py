@@ -89,7 +89,7 @@ class Server:
             anonymizer_result = self.anonymizer.anonymize(
                 text=content.get("text", ""),
                 analyzer_results=analyzer_results,
-                operators={"DEFAULT": OperatorConfig("genz", {})},
+                operators={"DEFAULT": OperatorConfig("genz")},
             )
 
             return Response(anonymizer_result.to_json(), mimetype="application/json")
