@@ -4,7 +4,6 @@ import logging
 import os
 from logging.config import fileConfig
 from pathlib import Path
-import json
 
 from flask import Flask, Response, jsonify, request
 from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
@@ -71,6 +70,15 @@ class Server:
         
         @self.app.route("/genz-preview", methods=["POST"])
         def genz_preview() -> Response:
+            return jsonify(
+                {
+                    "example": "Call Emily at 577-988-1234",
+                    "example output": "Call GOAT at vibe check",
+                    "description": "Example output of the genz anonymizer."
+                })
+        
+        @self.app.route("/genz", methods=["POST"])
+        def genz() -> Response:
             content = request.get_json()
             if not content:
                 raise BadRequest("Invalid request json")
@@ -84,7 +92,7 @@ class Server:
                 operators={"DEFAULT": OperatorConfig("genz", {})},
             )
 
-            return Response(json.dumps({"example":content.get("text", ""), "example_output": anonymizer_result.text, "description": "Example output of the genz anonymizer."}), mimetype="application/json")
+            return Response(anonymizer_result.to_json(), mimetype="application/json")
 
         @self.app.route("/deanonymize", methods=["POST"])
         def deanonymize() -> Response:
