@@ -75,7 +75,8 @@ class Server:
                     "example": "Call Emily at 577-988-1234",
                     "example output": "Call GOAT at vibe check",
                     "description": "Example output of the genz anonymizer."
-                })
+                }
+            )
         
         @self.app.route("/genz", methods=["POST"])
         def genz() -> Response:
