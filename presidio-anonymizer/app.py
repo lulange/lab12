@@ -4,12 +4,14 @@ import logging
 import os
 from logging.config import fileConfig
 from pathlib import Path
+import json
 
 from flask import Flask, Response, jsonify, request
 from presidio_anonymizer import AnonymizerEngine, DeanonymizeEngine
 from presidio_anonymizer.entities import InvalidParamError
 from presidio_anonymizer.services.app_entities_convertor import AppEntitiesConvertor
 from werkzeug.exceptions import BadRequest, HTTPException
+from presidio_anonymizer.entities.engine import OperatorConfig
 
 DEFAULT_PORT = "3000"
 
@@ -66,6 +68,28 @@ class Server:
                 operators=anonymizers_config,
             )
             return Response(anoymizer_result.to_json(), mimetype="application/json")
+        
+        @self.app.route("/genz-preview", methods=["POST"])
+        def genz_preview() -> Response:
+            content = request.get_json()
+            if not content:
+                raise BadRequest("Invalid request json")
+
+            analyzer_results = AppEntitiesConvertor.analyzer_results_from_json(
+                content.get("analyzer_results")
+            )
+            anonymizer_result = self.anonymizer.anonymize(
+                text=content.get("text", ""),
+                analyzer_results=analyzer_results,
+                operators={"DEFAULT": OperatorConfig("genz", {})},
+            )
+
+            
+            #"example": "Call Emily at 577-988-1234",
+            #"example output": "Call GOAT at vibe check",
+            #"description": "Example output of the genz anonymizer."
+
+            return Response(json.dumps({"example":content.get("text", ""), "example_output": anonymizer_result.text, "description": "Example output of the genz anonymizer."}), mimetype="application/json")
 
         @self.app.route("/deanonymize", methods=["POST"])
         def deanonymize() -> Response:
