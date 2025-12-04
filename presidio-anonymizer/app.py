@@ -84,11 +84,6 @@ class Server:
                 operators={"DEFAULT": OperatorConfig("genz", {})},
             )
 
-            
-            #"example": "Call Emily at 577-988-1234",
-            #"example output": "Call GOAT at vibe check",
-            #"description": "Example output of the genz anonymizer."
-
             return Response(json.dumps({"example":content.get("text", ""), "example_output": anonymizer_result.text, "description": "Example output of the genz anonymizer."}), mimetype="application/json")
 
         @self.app.route("/deanonymize", methods=["POST"])
